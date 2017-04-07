@@ -1,15 +1,13 @@
 setup:
-	@go get -u -v ./...
 	go get -u golang.org/x/tools/cmd/goimports
 	go get -u github.com/golang/lint/golint
+	go get -u github.com/Masterminds/glide
+	glide install
+	@echo "Install pre-commit hook"
+	ln -s $(shell pwd)/hooks/pre-commit $(shell pwd)/.git/hooks/pre-commit
 
+.PHONY: check
 check:
-	@echo "1. formating code"
-	@goimports -w .
-	@echo "2. lint go code"
-	@golint ./...
+	@./hack/check.sh ${scope}
 
-test:
-	go test -v
-
-ci: setup check test
+ci: setup check

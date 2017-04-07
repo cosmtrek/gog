@@ -13,7 +13,6 @@ import (
 	"strings"
 )
 
-// Config holds all info
 type Config struct {
 	Project     string
 	ProjectRoot string
@@ -39,6 +38,7 @@ func main() {
 `)
 
 	var err error
+	var gopath string
 	var template string
 	var project string
 	flag.StringVar(&template, "template", "", "project template")
@@ -46,7 +46,8 @@ func main() {
 	flag.Parse()
 
 	if template == "" {
-		log.Fatal("must specify template dir")
+		gopath = strings.Split(os.Getenv("GOPATH"), ":")[0]
+		template = gopath + "/src/github.com/cosmtrek/gog/template"
 	}
 	if project == "" {
 		log.Fatal("must specify project name")
