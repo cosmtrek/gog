@@ -17,5 +17,4 @@ My golang project template
 
 ## How to use
 
-`gog -template=$GOPATH/src/github.com/cosmtrek/gog/template -project=YOUR_PROJECT`
-
+`gog -project=YOUR_PROJECT`
