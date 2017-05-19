@@ -38,16 +38,22 @@ func main() {
 `)
 
 	var err error
-	var gopath string
 	var template string
 	var project string
 	flag.StringVar(&template, "template", "", "project template")
-	flag.StringVar(&project, "project", "", "project name")
 	flag.Parse()
 
 	if template == "" {
-		gopath = strings.Split(os.Getenv("GOPATH"), ":")[0]
-		template = gopath + "/src/github.com/cosmtrek/gog/template"
+		gopaths := strings.Split(os.Getenv("GOPATH"), ":")
+		for _, path := range gopaths {
+			template = strings.TrimSpace(path) + "/src/github.com/cosmtrek/gog/template"
+			if _, err := os.Stat(template); err == nil {
+				break
+			}
+		}
+	}
+	if len(os.Args) == 2 {
+		project = strings.TrimSpace(os.Args[1])
 	}
 	if project == "" {
 		log.Fatal("must specify project name")
@@ -62,7 +68,6 @@ func main() {
 
 	root := pwd + "/" + project
 	config.ProjectRoot = root
-
 	err = filepath.Walk(template, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -104,5 +109,6 @@ func parseTemplateAndOutput(path string, file os.FileInfo) error {
 			log.Fatal(err)
 		}
 	}
+	// TODO: write executable file
 	return ioutil.WriteFile(p, buf.Bytes(), 0644)
 }

@@ -17,4 +17,4 @@ My golang project template
 
 ## How to use
 
-`gog -project=YOUR_PROJECT`
+`gog YOUR_PROJECT`

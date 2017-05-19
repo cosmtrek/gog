@@ -32,9 +32,8 @@ echo "${reset}"
 if [[ ${exit_code} -ne 0 ]]; then
     echo "${red}Please fix the errors above :)"
 else
-    echo "${green}Seems good!"
+    echo "${green}Nice!"
 fi
 echo "${reset}"
 
 exit ${exit_code}
-
