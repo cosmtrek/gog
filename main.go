@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"html/template"
+	htmpl "html/template"
 	"io"
 	"io/ioutil"
 	"log"
@@ -13,19 +13,23 @@ import (
 	"strings"
 )
 
+const (
+	tmpl = ".tmpl"
+)
+
+var (
+	config Config
+	// https://choosealicense.com/licenses
+	supportedLicenses = []string{"GPL3", "MIT", "APACHE", "UNLICENSE"}
+)
+
+// Config ...
 type Config struct {
 	Project     string
 	ProjectRoot string
 	Template    string
+	License     htmpl.HTML
 }
-
-var (
-	config Config
-)
-
-const (
-	tmpl = ".tmpl"
-)
 
 func main() {
 	fmt.Println(`
@@ -33,42 +37,56 @@ func main() {
   / ___\ /  _ \ / ___\
  / /_/  >  <_> ) /_/  >
  \___  / \____/\___  /
-/_____/       /_____/
+/_____/       /_____/`)
 
-`)
+	parseConfig()
+	generateProject()
 
+	fmt.Println("\n\nmake setup and Happy hacking!")
+}
+
+func parseConfig() {
 	var err error
 	var template string
 	var project string
+	var license string
+
+	flag.StringVar(&project, "project", "", "project name")
 	flag.StringVar(&template, "template", "", "project template")
+	flag.StringVar(&license, "license", "GPL3", "license for project")
 	flag.Parse()
 
 	if template == "" {
-		gopaths := strings.Split(os.Getenv("GOPATH"), ":")
-		for _, path := range gopaths {
-			template = strings.TrimSpace(path) + "/src/github.com/cosmtrek/gog/template"
-			if _, err := os.Stat(template); err == nil {
-				break
-			}
-		}
-	}
-	if len(os.Args) == 2 {
-		project = strings.TrimSpace(os.Args[1])
-	}
-	if project == "" {
-		log.Fatal("must specify project name")
+		template = findGogTemplate()
 	}
 	config.Template = template
+
+	if project == "" {
+		log.Fatalln("must specify project name")
+	}
 	config.Project = project
 
 	pwd, err := os.Getwd()
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	root := pwd + "/" + project
 	config.ProjectRoot = root
-	err = filepath.Walk(template, func(path string, f os.FileInfo, err error) error {
+
+	if isLicenseSupported(supportedLicenses, license) {
+		txt, err := readLicense(license)
+		if err == nil {
+			config.License = htmpl.HTML(string(txt))
+		} else {
+			log.Println(err)
+		}
+	} else {
+		log.Println("currently not support this license " + license)
+	}
+}
+
+func generateProject() {
+	err := filepath.Walk(config.Template, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -77,9 +95,6 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println(`
-Happy hacking!
-`)
 }
 
 func parseTemplateAndOutput(path string, file os.FileInfo) error {
@@ -102,7 +117,7 @@ func parseTemplateAndOutput(path string, file os.FileInfo) error {
 	buf := bytes.NewBuffer(nil)
 	io.Copy(buf, f)
 	if strings.Contains(file.Name(), tmpl) {
-		tpl := template.Must(template.New("gog").Parse(buf.String()))
+		tpl := htmpl.Must(htmpl.New("gog").Parse(buf.String()))
 		// discard previous content
 		buf.Reset()
 		if err := tpl.Execute(buf, config); err != nil {
@@ -111,4 +126,35 @@ func parseTemplateAndOutput(path string, file os.FileInfo) error {
 	}
 	// TODO: write executable file
 	return ioutil.WriteFile(p, buf.Bytes(), 0644)
+}
+
+func isLicenseSupported(licenses []string, license string) bool {
+	l := strings.ToUpper(license)
+	for i := 0; i < len(licenses); i++ {
+		if l == licenses[i] {
+			return true
+		}
+	}
+	return false
+}
+
+func readLicense(name string) ([]byte, error) {
+	file := findGogRoot() + "/licenses" + "/" + strings.ToUpper(name)
+	return ioutil.ReadFile(file)
+}
+
+func findGogRoot() string {
+	gopaths := strings.Split(os.Getenv("GOPATH"), ":")
+	for _, path := range gopaths {
+		root := strings.TrimSpace(path) + "/src/github.com/cosmtrek/gog"
+		if _, err := os.Stat(root); err == nil {
+			return root
+		}
+	}
+	return ""
+}
+
+func findGogTemplate() string {
+	root := findGogRoot()
+	return root + "/template"
 }

@@ -7,7 +7,7 @@
 
 ```
 
-My golang project template
+My go project template
 
 ## Install
 
@@ -15,4 +15,4 @@ My golang project template
 
 ## How to use
 
-`gog YOUR_PROJECT`
+`gog -project YOUR_PROJECT -license GPL3`
