@@ -7,13 +7,13 @@
 
 ```
 
-My go project template
+Go project template [![CircleCI](https://circleci.com/gh/cosmtrek/gog/tree/master.svg?style=shield)](https://circleci.com/gh/cosmtrek/gog/tree/master)
 
 ## Install
 
 `go get github.com/cosmtrek/gog`
 
-## How to use
+## Usage
 
 ```bash
 # new proejct
