@@ -15,4 +15,10 @@ My go project template
 
 ## How to use
 
-`gog -project YOUR_PROJECT -license GPL3`
+```bash
+# new proejct
+gog -project YOUR_PROJECT -license GPL3
+cd YOUR_PROJECT
+make setup
+# update .circleci/config.yaml
+```
