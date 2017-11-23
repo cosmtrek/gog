@@ -42,7 +42,7 @@ func main() {
 	parseConfig()
 	generateProject()
 
-	fmt.Println("\n\nmake setup and Happy hacking!")
+	fmt.Println("\n\nmake setup and happy hacking!")
 }
 
 func parseConfig() {
