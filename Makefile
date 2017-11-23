@@ -6,9 +6,10 @@ init:
 	go get -u golang.org/x/tools/cmd/goimports
 	go get -u github.com/golang/lint/golint
 	go get -u github.com/Masterminds/glide
+	@chmod +x ./hack/check.sh
+	@chmod +x ./hooks/pre-commit
 	@echo "Install pre-commit hook"
 	@ln -s $(shell pwd)/hooks/pre-commit $(shell pwd)/.git/hooks/pre-commit || true
-	@chmod +x ./hack/check.sh
 
 .PHONY: setup
 setup: init
@@ -21,7 +22,6 @@ check:
 
 .PHONY: ci
 ci: init
-	@glide install
 	@make check
 
 .PHONY: build
