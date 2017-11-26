@@ -8,12 +8,12 @@ init:
 	go get -u github.com/Masterminds/glide
 	@chmod +x ./hack/check.sh
 	@chmod +x ./hooks/pre-commit
-	@echo "Install pre-commit hook"
-	@ln -s $(shell pwd)/hooks/pre-commit $(shell pwd)/.git/hooks/pre-commit || true
 
 .PHONY: setup
 setup: init
 	git init
+	@echo "Install pre-commit hook"
+	@ln -s $(shell pwd)/hooks/pre-commit $(shell pwd)/.git/hooks/pre-commit || true
 	glide init
 
 .PHONY: check
