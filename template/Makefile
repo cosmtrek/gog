@@ -1,5 +1,5 @@
-LDFLAGS += -X "main.BuildTimestamp=$(shell date -u "+%Y-%m-%d %H:%M:%S")"
-LDFLAGS += -X "main.Version=$(shell git rev-parse HEAD)"
+LDFLAGS += -X "main.buildTime=$(shell date -u "+%Y-%m-%d %H:%M:%S")"
+LDFLAGS += -X "main.version=$(shell git rev-parse HEAD)"
 
 .PHONY: init
 init:
